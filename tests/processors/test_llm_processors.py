@@ -121,7 +121,7 @@ def test_llm_caption_processor(pdf_document):
     mock_cls = Mock()
     mock_cls.return_value = {"image_description": description}
 
-    config = {"use_llm": True, "gemini_api_key": "test", "extract_images": False}
+    config = {"use_llm": True, "gemini_api_key": "test"}
     processor_lst = [LLMImageDescriptionProcessor(config)]
     processor = LLMSimpleBlockMetaProcessor(processor_lst, mock_cls, config)
     processor(pdf_document)
@@ -130,10 +130,12 @@ def test_llm_caption_processor(pdf_document):
     assert all(picture.description == description for picture in contained_pictures)
 
     # Ensure the rendering includes the description
-    renderer = MarkdownRenderer({"extract_images": False})
-    md = renderer(pdf_document).markdown
+    renderer = MarkdownRenderer()
+    output = renderer(pdf_document)
+    md = output.markdown
+    image_name = list(output.images.keys())[0]
 
-    assert description in md
+    assert f"![{description}]({image_name})" in md
 
 
 @pytest.mark.filename("A17_FlightPlan.pdf")

@@ -268,6 +268,7 @@ class MarkdownRenderer(HTMLRenderer):
     block_math_delimiters: Annotated[
         Tuple[str], "The delimiters to use for block math."
     ] = ("$$", "$$")
+    render_images: Annotated[bool, "Whether to render images in the markdown."] = True
 
     @property
     def md_cls(self):
@@ -287,6 +288,7 @@ class MarkdownRenderer(HTMLRenderer):
         )
 
     def __call__(self, document: Document) -> MarkdownOutput:
+        self.extract_images = self.render_images
         document_output = document.render(self.block_config)
         full_html, images = self.extract_html(document, document_output)
         markdown = self.md_cls.convert(full_html)

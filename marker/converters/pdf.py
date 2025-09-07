@@ -141,6 +141,8 @@ class PdfConverter(BaseConverter):
         self.llm_service = llm_service
 
         self.renderer = renderer
+        if self.renderer == MarkdownRenderer:
+            self.renderer.render_images = self.config.get("extract_images", True)
 
         processor_list = self.initialize_processors(processor_list)
         self.processor_list = processor_list
