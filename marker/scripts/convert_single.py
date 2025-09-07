@@ -37,7 +37,7 @@ def convert_single_cli(fpath: str, **kwargs):
     )
     rendered = converter(fpath)
     out_folder = config_parser.get_output_folder(fpath)
-    save_output(rendered, out_folder, config_parser.get_base_filename(fpath))
+    save_output(rendered, out_folder, config_parser.get_base_filename(fpath), fpath)
 
     logger.info(f"Saved markdown to {out_folder}")
     logger.info(f"Total time: {time.time() - start}")

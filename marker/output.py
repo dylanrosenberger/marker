@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 from bs4 import BeautifulSoup, Tag
 from pydantic import BaseModel
@@ -77,7 +78,9 @@ def convert_if_not_rgb(image: Image.Image) -> Image.Image:
     return image
 
 
-def save_output(rendered: BaseModel, output_dir: str, fname_base: str):
+def save_output(
+    rendered: BaseModel, output_dir: str, fname_base: str, pdf_path: str = None
+):
     text, ext, images = text_from_rendered(rendered)
     text = text.encode(settings.OUTPUT_ENCODING, errors="replace").decode(
         settings.OUTPUT_ENCODING
@@ -99,3 +102,6 @@ def save_output(rendered: BaseModel, output_dir: str, fname_base: str):
     for img_name, img in images.items():
         img = convert_if_not_rgb(img)  # RGBA images can't save as JPG
         img.save(os.path.join(output_dir, img_name), settings.OUTPUT_IMAGE_FORMAT)
+
+    if pdf_path:
+        shutil.copy(pdf_path, output_dir)
