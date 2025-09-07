@@ -96,14 +96,19 @@ class HTMLRenderer(BaseRenderer):
                     break
 
             if ref_block_id.block_type in self.image_blocks:
-                image = self.extract_image(document, ref_block_id)
-                image_name = f"{ref_block_id.to_path()}.{settings.OUTPUT_IMAGE_FORMAT.lower()}"
-                images[image_name] = image
-                alt_text = content.strip()
-                element = BeautifulSoup(
-                    f"<p><img src='{image_name}' alt='{alt_text}'></p>", "html.parser"
-                )
-                ref.replace_with(self.insert_block_id(element, ref_block_id))
+                if self.extract_images:
+                    image = self.extract_image(document, ref_block_id)
+                    image_name = f"{ref_block_id.to_path()}.{settings.OUTPUT_IMAGE_FORMAT.lower()}"
+                    images[image_name] = image
+                    alt_text = content.strip()
+                    element = BeautifulSoup(
+                        f"<p><img src='{image_name}' alt='{alt_text}'></p>", "html.parser"
+                    )
+                    ref.replace_with(self.insert_block_id(element, ref_block_id))
+                else:
+                    # This will be the image description if using llm mode, or empty if not
+                    element = BeautifulSoup(f"{content}", "html.parser")
+                    ref.replace_with(self.insert_block_id(element, ref_block_id))
             elif ref_block_id.block_type in self.page_blocks:
                 images.update(sub_images)
                 if self.paginate_output:

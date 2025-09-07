@@ -133,9 +133,19 @@ def test_llm_caption_processor(pdf_document):
     renderer = MarkdownRenderer()
     output = renderer(pdf_document)
     md = output.markdown
-    image_name = list(output.images.keys())[0]
 
-    assert f"![{description}]({image_name})" in md
+    # Find all image links in the markdown
+    import re
+    image_links = re.findall(r"!\[(.*?)\]\((.*?)\)", md)
+
+    # Check that the description is in the alt text of an image
+    found = False
+    for alt_text, image_name in image_links:
+        if alt_text == description:
+            assert image_name in output.images
+            found = True
+            break
+    assert found
 
 
 @pytest.mark.filename("A17_FlightPlan.pdf")
